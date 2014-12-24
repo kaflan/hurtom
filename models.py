@@ -156,7 +156,7 @@ class User(UserMixin, Base):
 
 
 class Payment(Base):
-    project_id  = Column(Integer, ForeignKey('project.id'), primary_key=True)
+    project_id = Column(Integer, ForeignKey('project.id'), primary_key=True)
     project = relationship("Project", backref='payments')
 
     owner_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
@@ -176,6 +176,8 @@ class Project(Base):
 
     # relations
     images = relationship("Image", backref="project")
+    
+
 
 
 class Image(Base):
@@ -191,7 +193,8 @@ class Image(Base):
 #     # Base.metadata.drop_all(bind=db.engine)
 #     Base.metadata.create_all(bind=db.engine)
 #     print('Create')
-# Base.metadata.create_all(bind=db.engine)
+
+Base.metadata.create_all(bind=db.engine)
 if __name__ == '__main__':
     engine, Base, Session = create_base()
     import ipdb
