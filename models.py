@@ -121,7 +121,7 @@ class User(UserMixin, Base):
         return str(self.email)
     email = Column(UString, nullable=False, unique=True, index=True)
 
-    login = Column(UString(30))
+    login = Column(UString(50))
     name = Column(UString(50))
     lastname = Column(UString(50))
 
@@ -142,22 +142,44 @@ class User(UserMixin, Base):
 
     fullname = column_property(name + " " + lastname)
 
+    # relations
+    images = relationship("Image", backref="owner")
+
+
+
+
     @property
     def email_url(self):
-        ''
+        pass
 
 class Project(Base):
     title = Column(UString)
     slug = Column(UString)
+    description  = Column(UText)
+    sum = Column(Integer, default=0)
+
+    date_start = Column(DateTime, default=func.now())
+    date_end = Column(DateTime, default=func.now())
+
+    # relations
+    images = relationship("Image", backref="project")
+
+
+class Image(Base):
+    filename = Column(String(200))
+    owner_id = Column(Integer, ForeignKey(User.id))
+    project_id = Column(Integer, ForeignKey(Project.id))
+    project1_id = Column(Integer, ForeignKey(Project.id))
 
 
 #
 # @app.before_first_request
 # def setup():
 #     # Recreate database each time for demo
-#     Base.metadata.drop_all(bind=db.engine)
+#     # Base.metadata.drop_all(bind=db.engine)
 #     Base.metadata.create_all(bind=db.engine)
-
+#     print('Create')
+Base.metadata.create_all(bind=db.engine)
 if __name__ == '__main__':
     engine, Base, Session = create_base()
     import ipdb
