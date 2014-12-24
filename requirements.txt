@@ -1,0 +1,10 @@
+Flask==0.10.1
+Flask-Classy==0.6.10
+Flask-PyMongo==0.3.0
+Jinja2==2.7.3
+MarkupSafe==0.23
+Werkzeug==0.9.6
+ipdb==0.8
+ipython==2.3.1
+itsdangerous==0.24
+pymongo==2.7.2
