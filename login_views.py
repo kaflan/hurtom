@@ -1,3 +1,4 @@
+# coding: utf-8
 from datetime import date, datetime
 
 from flask import (flash, Flask, g, make_response, redirect, render_template,
