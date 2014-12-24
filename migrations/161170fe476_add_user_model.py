@@ -1,14 +1,14 @@
-"""Init database
+"""Add User model
 
-Revision ID: 3d62886076c
-Revises: 
-Create Date: 2014-12-25 01:08:02.707752
+Revision ID: 161170fe476
+Revises: 37973729868
+Create Date: 2014-12-25 01:24:46.673537
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '3d62886076c'
-down_revision = None
+revision = '161170fe476'
+down_revision = '37973729868'
 branch_labels = ()
 depends_on = None
 
@@ -35,8 +35,6 @@ def downgrade():
     sa.Column('is_active', sa.BOOLEAN(), autoincrement=False, nullable=True),
     sa.Column('is_admin', sa.BOOLEAN(), autoincrement=False, nullable=True),
     sa.Column('use_avatar', sa.BOOLEAN(), autoincrement=False, nullable=True),
-    sa.Column('github', postgresql.JSON(), autoincrement=False, nullable=True),
-    sa.Column('google', postgresql.JSON(), autoincrement=False, nullable=True),
     sa.Column('id', sa.INTEGER(), nullable=False),
     sa.PrimaryKeyConstraint('id', name='user_pkey')
     )

@@ -6,6 +6,8 @@ from __future__ import division, print_function, unicode_literals
 from flask.ext.login import UserMixin
 
 from app import app, db
+from sqlalchemy import Table, Column, Integer, ForeignKey
+
 from sqlalchemy import (Boolean, Column, create_engine, Date, DateTime,
                         ForeignKey, func, Integer, Numeric, select, Sequence,
                         String, Text, text, Unicode, UnicodeText)
@@ -152,6 +154,17 @@ class User(UserMixin, Base):
     def email_url(self):
         pass
 
+
+class Payment(Base):
+    project_id  = Column(Integer, ForeignKey('project.id'), primary_key=True)
+    project = relationship("Project", backref='payments')
+
+    owner_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
+    owner = relationship("User", backref='payments')
+
+    date = Column('date',DateTime, default=func.now())
+
+
 class Project(Base):
     title = Column(UString)
     slug = Column(UString)
@@ -169,7 +182,6 @@ class Image(Base):
     filename = Column(String(200))
     owner_id = Column(Integer, ForeignKey(User.id))
     project_id = Column(Integer, ForeignKey(Project.id))
-    project1_id = Column(Integer, ForeignKey(Project.id))
 
 
 #
@@ -179,7 +191,7 @@ class Image(Base):
 #     # Base.metadata.drop_all(bind=db.engine)
 #     Base.metadata.create_all(bind=db.engine)
 #     print('Create')
-Base.metadata.create_all(bind=db.engine)
+# Base.metadata.create_all(bind=db.engine)
 if __name__ == '__main__':
     engine, Base, Session = create_base()
     import ipdb
