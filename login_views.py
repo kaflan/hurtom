@@ -1,11 +1,18 @@
+from datetime import date, datetime
+
+from flask import (flash, Flask, g, make_response, redirect, render_template,
+                   request, url_for)
+from flask.ext.classy import FlaskView, route
+from flask.ext.login import (current_user, login_required, login_user,
+                             LoginManager, logout_user, UserMixin)
+
+from app import app,db
+from form import LoginForm, RegisterForm
+from rauth import OAuth2Service
+from models import User
 __author__ = 'ihor'
-from  app import app, mongo
 
-from flask import Flask, g, render_template, make_response, url_for,redirect
-from flask.ext.login import LoginManager
 
-from flask.ext.classy import FlaskView
-from flask.ext.login import LoginManager, login_required, login_user, current_user,logout_user
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'Login:index'
@@ -16,23 +23,16 @@ login_manager.session_protection = "strong"
 
 # login_user(user, remember=True)
 
-from flask.ext.login import UserMixin
 
-class ProxyUser(UserMixin):
-   is_authenticated = True
-   is_active = True
-   is_anonymous = True
+#
+#     mongo.db.users.save(example_user)
 
-   def get_id(self):
-       return "3"
 
 @login_manager.user_loader
 def load_user(userid):
-    return ProxyUser() # User.get(userid)
+    return  db.session.query(User).get(userid)
 
 
-
-from rauth import OAuth2Service
 #
 # Client ID
 # 5d6035a213a5c92fe834
@@ -58,17 +58,11 @@ github = OAuth2Service(
     base_url='https://api.github.com/')
 
 print(github.get_authorize_url())
+# import ipdb; ipdb.set_trace()
 #data = dict(code=code_, redirect_uri='http://localhost:8000/login/github')
 # session = github.get_auth_session(data=data)
- # session.get('user').json()
+# session.get('user').json()
 
-
-
-
-@login_required
-@app.route('/')
-def hello_world():
-    return 'Hello World!'+url_for('Login:index')
 
 class Base(FlaskView):
     route_prefix = '/login/'
@@ -82,28 +76,52 @@ class Base(FlaskView):
 
 
 class Github(Base):
+
     def index(self):
         return 'Index'
 
     def callback(self):
         return 'github'
 
+
 class Login(FlaskView):
     # route_prefix = '/login/'
     # route_base = '/'
 
     def index(self):
-        return 'lol'
+        return render_template('form.html', form=LoginForm())
+
+    @route('/register/')
+    def register_(self):
+        form = RegisterForm()
+        if form.validate_on_submit():
+            print(form.data)
+        else:
+            print(form.errors)
+
+        return render_template('form.html', form=form)
 
     def post(self):
-        return 'post'
+        form = LoginForm()
+        if form.validate_on_submit():
+            print(form.data)  # success
+            User.query.all()
+            # user = db.session.query(User).first(form.)
+            flash("Logged in successfully.")
+
+            # login_user(user=user)
+        else:
+            print(form.errors)
+        # import ipdb; ipdb.set_trace()
+        print(form.email.flags)
+        return render_template('form.html', form=form)
 
     def success(self):
         return 'success'
 
     @login_required
     def logout(self):
-        #logout_user()
+        # logout_user()
         print(url_for('Login:success_logout'))
         return redirect(url_for('Login:success_logout'))
 

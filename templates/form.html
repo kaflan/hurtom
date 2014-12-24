@@ -1,10 +1,33 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+{% extends "base.html" %}
+{% macro render_field(field) %}
+    {% if field.type ==  "CSRFTokenField" %}
+        {{ field() }}
+    {% elif field.type ==  "SubmitField" %}
+        {{ field() }}
+    {% else %}
+    <p>
+        {{ field.label }}
+        {{ field(**field.flags.__dict__)|safe }}
+        {% if field.errors %}
+            <ul class=errors>
+                {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </p>
+    {% endif %}
+{% endmacro %}
+{% block content %}
+    <h1>Sign In</h1>
+{#    {% if form.email.data %}#}
+{#        <img src="{{ form.email.data| gravatar }}" alt=""/>#}
+{#    {% endif %}#}
+{#    <img src="{{ (form.email.data or "") | gravatar }}" alt=""/>#}
+    <form action="" method="post", name="login">
+    {% for field in form %}
+        {{ render_field(field) }}
+    {% endfor %}
+    </form>
 
-</body>
-</html>
+{% endblock %}
