@@ -7,10 +7,11 @@ from flask.ext.classy import FlaskView, route
 from flask.ext.login import (current_user, login_required, login_user,
                              LoginManager, logout_user, UserMixin)
 
-from app import app,db
+from app import app, db
 from form import LoginForm, RegisterForm
-from rauth import OAuth2Service
 from models import User
+from rauth import OAuth2Service
+
 __author__ = 'ihor'
 
 
@@ -31,7 +32,7 @@ login_manager.session_protection = "strong"
 
 @login_manager.user_loader
 def load_user(userid):
-    return  db.session.query(User).get(userid)
+    return db.session.query(User).get(userid)
 
 
 #

@@ -32,14 +32,11 @@ if True:
     from models import Base
 
 
-
-
 if __name__ == '__main__':
     print(app.url_map)
 
     # handler = RotatingFileHandler('logs/app.log', maxBytes=10000, backupCount=1)
     # handler.setLevel(logging.INFO)
     # app.logger.addHandler(handler)
-
 
     app.run(use_debugger=app.debug, port=8000)

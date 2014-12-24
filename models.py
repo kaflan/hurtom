@@ -6,18 +6,16 @@ from __future__ import division, print_function, unicode_literals
 from flask.ext.login import UserMixin
 
 from app import app, db
-from sqlalchemy import Table, Column, Integer, ForeignKey
-
 from sqlalchemy import (Boolean, Column, create_engine, Date, DateTime,
                         ForeignKey, func, Integer, Numeric, select, Sequence,
-                        String, Text, text, Unicode, UnicodeText)
+                        String, Table, Text, text, Unicode, UnicodeText)
 from sqlalchemy.dialects.postgresql import ENUM, JSON
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import (backref, column_property, object_session,
                             relationship, scoped_session, sessionmaker,
                             validates)
-from sqlalchemy.ext.mutable import MutableDict
 
 __author__ = 'ihor'
 
@@ -116,6 +114,8 @@ Base = declarative_base(cls=Base)
 # )
 
 gravatar = app.extensions['gravatar']
+
+
 class User(UserMixin, Base):
 
     @property
@@ -141,14 +141,10 @@ class User(UserMixin, Base):
 
     avatar = db.Column(db.String(200))
 
-
     fullname = column_property(name + " " + lastname)
 
     # relations
     images = relationship("Image", backref="owner")
-
-
-
 
     @property
     def email_url(self):
@@ -162,13 +158,13 @@ class Payment(Base):
     owner_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
     owner = relationship("User", backref='payments')
 
-    date = Column('date',DateTime, default=func.now())
+    date = Column('date', DateTime, default=func.now())
 
 
 class Project(Base):
     title = Column(UString)
     slug = Column(UString)
-    description  = Column(UText)
+    description = Column(UText)
     sum = Column(Integer, default=0)
 
     date_start = Column(DateTime, default=func.now())
@@ -176,8 +172,6 @@ class Project(Base):
 
     # relations
     images = relationship("Image", backref="project")
-    
-
 
 
 class Image(Base):
@@ -189,8 +183,8 @@ class Image(Base):
 #
 # @app.before_first_request
 # def setup():
-#     # Recreate database each time for demo
-#     # Base.metadata.drop_all(bind=db.engine)
+# Recreate database each time for demo
+# Base.metadata.drop_all(bind=db.engine)
 #     Base.metadata.create_all(bind=db.engine)
 #     print('Create')
 

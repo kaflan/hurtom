@@ -1,8 +1,8 @@
-__author__ = 'ihor'
-
 from flask.ext.wtf import Form
+
 from app import app
 from models import User
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from wtforms import (BooleanField, FieldList, FormField, HiddenField,
                      PasswordField, SelectMultipleField, StringField,
                      SubmitField, TextAreaField)
@@ -10,7 +10,6 @@ from wtforms.ext.sqlalchemy.orm import model_form
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, ValidationError
 
-from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 class LoginForm(Form):
     email = EmailField(
@@ -39,10 +38,11 @@ class RegisterForm(Form):
     password_again = PasswordField(
         'Password again', validators=[DataRequired()])
     submit = SubmitField('Register')
+
     def validate_email(form, field):
-      user = User.query.filter(User.email == field.data).first()
-      if user is not None:
-          raise ValidationError("A user with that email already exists")
+        user = User.query.filter(User.email == field.data).first()
+        if user is not None:
+            raise ValidationError("A user with that email already exists")
 
 
 class ForgetForm(Form):
