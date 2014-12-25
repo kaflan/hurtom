@@ -52,8 +52,8 @@ def load_user(userid):
 #
 #
 github = OAuth2Service(
-    client_id='5d6035a213a5c92fe834',
-    client_secret='ed21f9eea8b9decab6bd834f6ae1a027b1b7b602',
+    client_id='db87c735a6ce6faaa2e1',
+    client_secret='90516141b451cc3e2ad7a8e55f4f9711d86813b2',
     name='github',
     authorize_url='https://github.com/login/oauth/authorize',
     access_token_url='https://github.com/login/oauth/access_token',
