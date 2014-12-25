@@ -1,4 +1,5 @@
-hurtom
+Hurtom
 ======
-Python3 is required
-Postgres with Json-field support 
+
+1. Python3 is required
+2. Postgres with Json-field support 
