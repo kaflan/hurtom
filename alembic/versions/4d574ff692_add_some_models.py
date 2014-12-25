@@ -1,19 +1,19 @@
-"""Init
+"""Add some models
 
-Revision ID: 37973729868
-Revises: 
-Create Date: 2014-12-25 01:23:29.871074
+Revision ID: 4d574ff692
+Revises: 2b20375fa7c
+Create Date: 2014-12-25 20:42:17.768303
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '37973729868'
-down_revision = None
-branch_labels = ()
+revision = '4d574ff692'
+down_revision = '2b20375fa7c'
+branch_labels = None
 depends_on = None
 
-import sqlalchemy as sa
 from alembic import op
+import sqlalchemy as sa
 
 
 def upgrade():

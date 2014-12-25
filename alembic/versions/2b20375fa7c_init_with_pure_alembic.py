@@ -1,19 +1,19 @@
-"""Add images and m2m
+"""Init with pure Alembic
 
-Revision ID: 4fbdb25ff6b
-Revises: 161170fe476
-Create Date: 2014-12-25 01:25:26.845373
+Revision ID: 2b20375fa7c
+Revises: 
+Create Date: 2014-12-25 20:40:42.517760
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '4fbdb25ff6b'
-down_revision = '161170fe476'
-branch_labels = ()
+revision = '2b20375fa7c'
+down_revision = None
+branch_labels = None
 depends_on = None
 
-import sqlalchemy as sa
 from alembic import op
+import sqlalchemy as sa
 
 
 def upgrade():
