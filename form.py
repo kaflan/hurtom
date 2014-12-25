@@ -1,4 +1,7 @@
+from flask.ext.babelex import gettext
 from flask.ext.wtf import Form
+from flask.ext.babelex import lazy_gettext as __
+from flask.ext.babelex import lazy_gettext
 
 from app import app
 from models import User
@@ -13,38 +16,40 @@ from wtforms.validators import DataRequired, ValidationError
 
 class LoginForm(Form):
     email = EmailField(
-        'Email', validators=[DataRequired(message="Username required")])
+        lazy_gettext('Email'), validators=[DataRequired(message=lazy_gettext("Username required"))])
     password = PasswordField(
-        'Password', validators=[DataRequired(message="Password required")])
-    remember_me = BooleanField('Remember Me', default=False)
-    submit = SubmitField('Sign in')
+        lazy_gettext ('Password'), validators=[DataRequired(message=lazy_gettext("Password required"))])
+    remember_me = BooleanField(lazy_gettext('Remember Me'), default=False)
+    submit = SubmitField(lazy_gettext('Sign in'))
 
     def validate_password(form, field):
         try:
             user = User.query.filter(User.email == form.email.data).one()
         except (MultipleResultsFound, NoResultFound):
-            raise ValidationError("Invalid user")
+            raise ValidationError(lazy_gettext("Invalid user"))
         if user is None:
-            raise ValidationError("Invalid user")
+            raise ValidationError(lazy_gettext("Invalid user"))
         if not user.is_valid_password(form.password.data):
-            raise ValidationError("Invalid password")
+            raise ValidationError(lazy_gettext("Invalid password"))
         form.user = user
 
 
 class RegisterForm(Form):
-    login = StringField('Login', validators=[DataRequired()])
-    email = EmailField('Email', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    login = StringField(lazy_gettext('Login'), validators=[DataRequired()])
+    email = EmailField(lazy_gettext('Email'), validators=[DataRequired()])
+    password = PasswordField(lazy_gettext('Password'), validators=[DataRequired()])
     password_again = PasswordField(
-        'Password again', validators=[DataRequired()])
-    submit = SubmitField('Register')
+        lazy_gettext('Password again'), validators=[DataRequired()])
+    submit = SubmitField(lazy_gettext('Register'))
 
     def validate_email(form, field):
         user = User.query.filter(User.email == field.data).first()
         if user is not None:
-            raise ValidationError("A user with that email already exists")
+            raise ValidationError(lazy_gettext("A user with that email already exists"))
 
 
 class ForgetForm(Form):
-    email = EmailField('email')
-    login = StringField('login')
+    email = EmailField(lazy_gettext('Email'))
+    login = StringField(lazy_gettext('Login'))
+
+fsafsdfsd = lazy_gettext('Loginfsdfsd')
