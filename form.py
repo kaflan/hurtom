@@ -1,7 +1,5 @@
-from flask.ext.babelex import gettext
 from flask.ext.wtf import Form
-from flask.ext.babelex import lazy_gettext as __
-from flask.ext.babelex import lazy_gettext
+from flask.ext.babelex import lazy_gettext,gettext
 
 from app import app
 from models import User
@@ -16,9 +14,9 @@ from wtforms.validators import DataRequired, ValidationError
 
 class LoginForm(Form):
     email = EmailField(
-        lazy_gettext('Email'), validators=[DataRequired(message=lazy_gettext("Username required"))])
+        lazy_gettext('Email'), validators=[DataRequired(message=lazy_gettext("Email required"))])
     password = PasswordField(
-        lazy_gettext ('Password'), validators=[DataRequired(message=lazy_gettext("Password required"))])
+        lazy_gettext('Password'), validators=[DataRequired(message=lazy_gettext("Password required"))])
     remember_me = BooleanField(lazy_gettext('Remember Me'), default=False)
     submit = SubmitField(lazy_gettext('Sign in'))
 
@@ -51,5 +49,3 @@ class RegisterForm(Form):
 class ForgetForm(Form):
     email = EmailField(lazy_gettext('Email'))
     login = StringField(lazy_gettext('Login'))
-
-fsafsdfsd = lazy_gettext('Loginfsdfsd')

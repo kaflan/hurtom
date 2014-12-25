@@ -1,1 +1,5 @@
-git+https://github.com/iho/babel.git@master#egg=babel
+cd /tmp
+git clone https://github.com/iho/babel
+cd babel
+python setup.py import_cldr
+python setup.py install
