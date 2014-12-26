@@ -14,8 +14,7 @@ alembic.init_app(app)
 @manager.command
 def automigrate(name=None):
     with app.app_context():
-        import ipdb
-        ipdb.set_trace()
+        # import ipdb;ipdb.set_trace()
         alembic.revision(name or "Init")
         alembic.upgrade()
 

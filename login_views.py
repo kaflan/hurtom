@@ -1,6 +1,6 @@
 # coding: utf-8
 from datetime import date, datetime
-
+from flask.ext.babelex import lazy_gettext
 from flask import (flash, Flask, g, make_response, redirect, render_template,
                    request, url_for)
 from flask.ext.classy import FlaskView, route
@@ -67,7 +67,7 @@ print(github.get_authorize_url())
 
 
 class Base(FlaskView):
-    route_prefix = '/login/'
+    route_prefix = '/auth/'
     # def before_request(self, name):
 
     def index(self):
@@ -85,31 +85,41 @@ class Github(Base):
     def callback(self):
         return 'github'
 
+class Register(Base):
+    def index(self):
+        return render_template('form.html', form=RegisterForm())
 
-class Login(FlaskView):
+    def post(self):
+        form = RegisterForm()
+        if form.validate_on_submit():
+            user = User()
+            user.email =  form.email.data
+            user.login =  form.login.data
+            user.set_password(form.password.data)
+            db.session.add(user)
+            db.session.commit()
+            login_user(user=user)
+            flash(lazy_gettext("You registered"))
+            return redirect(url_for('Login:success'))
+        return render_template('form.html', form=form)
+
+
+class Login(Base):
     # route_prefix = '/login/'
     # route_base = '/'
 
     def index(self):
         return render_template('form.html', form=LoginForm())
 
-    @route('/register/')
-    def register_(self):
-        form = RegisterForm()
-        if form.validate_on_submit():
-            print(form.data)
-        else:
-            print(form.errors)
-
-        return render_template('form.html', form=form)
-
     def post(self):
         form = LoginForm()
         if form.validate_on_submit():
             print(form.data)  # success
-            User.query.all()
-            # user = db.session.query(User).first(form.)
-            flash("Logged in successfully.")
+            print(User.query.all())
+            user = db.session.query(User).first(form.email)
+            print(user)
+            import ipdb; ipdb.set_trace()
+            flash(lazy_gettext("Logged in successfully."))
 
             # login_user(user=user)
         else:
@@ -119,12 +129,11 @@ class Login(FlaskView):
         return render_template('form.html', form=form)
 
     def success(self):
-        return 'success'
+        return 'success logined'
 
     @login_required
     def logout(self):
-        # logout_user()
-        print(url_for('Login:success_logout'))
+        logout_user()
         return redirect(url_for('Login:success_logout'))
 
     def success_logout(self):
@@ -133,3 +142,4 @@ class Login(FlaskView):
 # Base.register(app)
 Github.register(app)
 Login.register(app)
+Register.register(app)

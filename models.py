@@ -16,9 +16,7 @@ from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import (backref, column_property, object_session,
                             relationship, scoped_session, sessionmaker,
                             validates)
-
-__author__ = 'ihor'
-
+import bcrypt
 
 UText = UnicodeText
 UString = Unicode
@@ -92,11 +90,11 @@ class Base(object):
     @property
     def _sesion(self):
         return object_session(self)
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-        return self
+    #
+    # def save(self):
+    #     db.session.add(self)
+    #     db.session.commit()
+    #     return self
 
 
 Base = declarative_base(cls=Base)
@@ -123,6 +121,8 @@ class User(UserMixin, Base):
         return str(self.email)
     email = Column(UString, nullable=False, unique=True, index=True)
 
+    password= Column(String(60))
+
     login = Column(UString(50))
     name = Column(UString(50))
     lastname = Column(UString(50))
@@ -132,8 +132,9 @@ class User(UserMixin, Base):
     date_joined = Column(DateTime, default=func.now())
     last_login = Column(DateTime, default=func.now())
 
-    is_active = Column(Boolean, default=True)
-    is_admin = Column(Boolean, default=False)
+    _active = Column("active", Boolean, default=True)
+    _admin = Column('admin', Boolean, default=False)
+
     use_avatar = Column(Boolean, default=False)
 
     github = Column(JSON)
@@ -144,21 +145,42 @@ class User(UserMixin, Base):
     fullname = column_property(name + " " + lastname)
 
     # relations
-    images = relationship("Image", backref="owner")
+    images = relationship("Image", backref="owner", cascade="all, delete, delete-orphan")
+    payments = relationship("Payment", backref="owner", cascade="all, delete, delete-orphan")
+    projects = relationship("Project", backref="owner", cascade="all, delete, delete-orphan")
+    backers = relationship("Backer", backref="owner", cascade="all, delete, delete-orphan")
 
-    @property
-    def email_url(self):
-        pass
 
+
+    def get_avatar_url(self):
+        return 'media/avatar.jpg'
+
+    def is_active(self):
+        return self._active
+
+
+    def set_password(self, password):
+        self.password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(12))
+
+    def check_password(self, value=u""):
+        return self.password == bcrypt.hashpw(value.encode("utf-8"), self.password)
+
+class  Backer(Base):
+  position = Column(Integer, default=0)
+  bigger = Column(Integer, default=0)
+  description = Column(UText)
+  limit = Column(Integer, default=0)
+  owner_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
 
 class Payment(Base):
-    project_id = Column(Integer, ForeignKey('project.id'), primary_key=True)
-    project = relationship("Project", backref='payments')
-
-    owner_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
-    owner = relationship("User", backref='payments')
-
     date = Column('date', DateTime, default=func.now())
+    sum = Column(Integer, default=0)
+    # choicetype(currency)
+
+    project_id = Column(Integer, ForeignKey('project.id'), primary_key=True)
+    owner_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
+
+
 
 
 class Project(Base):
@@ -171,25 +193,50 @@ class Project(Base):
     date_end = Column(DateTime, default=func.now())
 
     # relations
-    images = relationship("Image", backref="project")
+    owner_id = Column(Integer, ForeignKey('user.id'))
+
+    images = relationship("Image", backref="project", cascade="all, delete, delete-orphan")
+    payments = relationship("Payment", backref='project', cascade="all, delete, delete-orphan")
+
 
 
 class Image(Base):
     filename = Column(String(200))
-    owner_id = Column(Integer, ForeignKey(User.id))
-    project_id = Column(Integer, ForeignKey(Project.id))
+    owner_id = Column(Integer, ForeignKey('user.id'))
+    project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
 
 
-#
-# @app.before_first_request
-# def setup():
-# Recreate database each time for demo
-# Base.metadata.drop_all(bind=db.engine)
-#     Base.metadata.create_all(bind=db.engine)
-#     print('Create')
-
-Base.metadata.create_all(bind=db.engine)
 if __name__ == '__main__':
-    engine, Base, Session = create_base()
+    # engine, Base, Session = create_base()
+    Base.metadata.drop_all(bind=db.engine)
+    Base.metadata.create_all(bind=db.engine)
+
+    user= User()
+    user.email = 'Iam@email.com'
+    user.set_password('1111')
+    db.session.add(user)
+
+    project = Project()
+    project.title = 'Title'
+    project.slug = 'Slug'
+    project.description = 'alal'
+    project.sum = 100
+    project.owner = user
+
+    payment = Payment()
+    payment.owner = user
+    payment.project = project
+
+    image = Image()
+    image.owner = user
+    image.project = project
+    image.filename = 'young_loli_hires.png'
+
+    backer = Backer()
+    backer.owner = user
+
+    db.session.add_all([user,project, payment, image, backer])
+    db.session.commit()
+
     import ipdb
     ipdb.set_trace()

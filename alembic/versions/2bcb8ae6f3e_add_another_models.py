@@ -1,14 +1,14 @@
-"""Add some models
+"""Add another models
 
-Revision ID: 4d574ff692
-Revises: 2b20375fa7c
-Create Date: 2014-12-25 20:42:17.768303
+Revision ID: 2bcb8ae6f3e
+Revises: 6d935a38f3
+Create Date: 2014-12-26 06:19:39.410387
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '4d574ff692'
-down_revision = '2b20375fa7c'
+revision = '2bcb8ae6f3e'
+down_revision = '6d935a38f3'
 branch_labels = None
 depends_on = None
 
