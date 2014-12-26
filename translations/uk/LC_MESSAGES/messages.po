@@ -53,7 +53,7 @@ msgstr "Неправильний пароль"
 
 #: form.py:36 form.py:51
 msgid "Login"
-msgstr "Лігн"
+msgstr "Логін"
 
 #: form.py:40
 msgid "Password again"
@@ -65,7 +65,7 @@ msgstr "Зареєструватися"
 
 #: form.py:46
 msgid "A user with that email already exists"
-msgstr "Користувач с такою поштою вже є"
+msgstr "Користувач з такою поштою вже є"
 
 #: templates/base.html:5
 msgid "Default title"

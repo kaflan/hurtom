@@ -21,53 +21,53 @@ msgstr ""
 
 #: form.py:17 form.py:37 form.py:50
 msgid "Email"
-msgstr ""
+msgstr "Почта"
 
 #: form.py:17
 msgid "Email required"
-msgstr ""
+msgstr "Почта обезательная"
 
 #: form.py:19 form.py:38
 msgid "Password"
-msgstr ""
+msgstr "Пароль"
 
 #: form.py:19
 msgid "Password required"
-msgstr ""
+msgstr "Пароль обезательная"
 
 #: form.py:20
 msgid "Remember Me"
-msgstr ""
+msgstr "Запомнить пароль"
 
 #: form.py:21
 msgid "Sign in"
-msgstr ""
+msgstr "Ввойти"
 
 #: form.py:27 form.py:29
 msgid "Invalid user"
-msgstr ""
+msgstr "Неправильний пользователь"
 
 #: form.py:31
 msgid "Invalid password"
-msgstr ""
+msgstr "Неправильний пароль"
 
 #: form.py:36 form.py:51
 msgid "Login"
-msgstr ""
+msgstr "Логін"
 
 #: form.py:40
 msgid "Password again"
-msgstr ""
+msgstr "Пароль снова"
 
 #: form.py:41
 msgid "Register"
-msgstr ""
+msgstr "Регсітрация"
 
 #: form.py:46
 msgid "A user with that email already exists"
-msgstr ""
+msgstr "Польщователь с такой почтой уже есть"
 
 #: templates/base.html:5
 msgid "Default title"
-msgstr ""
+msgstr "Тайтл"
 
