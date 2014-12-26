@@ -5,6 +5,7 @@ from __future__ import division, print_function, unicode_literals
 
 from flask.ext.login import UserMixin
 
+import bcrypt
 from app import app, db
 from sqlalchemy import (Boolean, Column, create_engine, Date, DateTime,
                         ForeignKey, func, Integer, Numeric, select, Sequence,
@@ -16,7 +17,6 @@ from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import (backref, column_property, object_session,
                             relationship, scoped_session, sessionmaker,
                             validates)
-import bcrypt
 
 UText = UnicodeText
 UString = Unicode
@@ -121,7 +121,7 @@ class User(UserMixin, Base):
         return str(self.email)
     email = Column(UString, nullable=False, unique=True, index=True)
 
-    password= Column(String(60))
+    password = Column(String(60))
 
     login = Column(UString(50))
     name = Column(UString(50))
@@ -145,12 +145,14 @@ class User(UserMixin, Base):
     fullname = column_property(name + " " + lastname)
 
     # relations
-    images = relationship("Image", backref="owner", cascade="all, delete, delete-orphan")
-    payments = relationship("Payment", backref="owner", cascade="all, delete, delete-orphan")
-    projects = relationship("Project", backref="owner", cascade="all, delete, delete-orphan")
-    backers = relationship("Backer", backref="owner", cascade="all, delete, delete-orphan")
-
-
+    images = relationship(
+        "Image", backref="owner", cascade="all, delete, delete-orphan")
+    payments = relationship(
+        "Payment", backref="owner", cascade="all, delete, delete-orphan")
+    projects = relationship(
+        "Project", backref="owner", cascade="all, delete, delete-orphan")
+    backers = relationship(
+        "Backer", backref="owner", cascade="all, delete, delete-orphan")
 
     def get_avatar_url(self):
         return 'media/avatar.jpg'
@@ -158,19 +160,21 @@ class User(UserMixin, Base):
     def is_active(self):
         return self._active
 
-
     def set_password(self, password):
-        self.password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(12))
+        self.password = bcrypt.hashpw(
+            password.encode("utf-8"), bcrypt.gensalt(12))
 
     def check_password(self, value=u""):
         return self.password == bcrypt.hashpw(value.encode("utf-8"), self.password)
 
-class  Backer(Base):
-  position = Column(Integer, default=0)
-  bigger = Column(Integer, default=0)
-  description = Column(UText)
-  limit = Column(Integer, default=0)
-  owner_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
+
+class Backer(Base):
+    position = Column(Integer, default=0)
+    bigger = Column(Integer, default=0)
+    description = Column(UText)
+    limit = Column(Integer, default=0)
+    owner_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
+
 
 class Payment(Base):
     date = Column('date', DateTime, default=func.now())
@@ -179,8 +183,6 @@ class Payment(Base):
 
     project_id = Column(Integer, ForeignKey('project.id'), primary_key=True)
     owner_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
-
-
 
 
 class Project(Base):
@@ -195,9 +197,10 @@ class Project(Base):
     # relations
     owner_id = Column(Integer, ForeignKey('user.id'))
 
-    images = relationship("Image", backref="project", cascade="all, delete, delete-orphan")
-    payments = relationship("Payment", backref='project', cascade="all, delete, delete-orphan")
-
+    images = relationship(
+        "Image", backref="project", cascade="all, delete, delete-orphan")
+    payments = relationship(
+        "Payment", backref='project', cascade="all, delete, delete-orphan")
 
 
 class Image(Base):
@@ -211,7 +214,7 @@ if __name__ == '__main__':
     Base.metadata.drop_all(bind=db.engine)
     Base.metadata.create_all(bind=db.engine)
 
-    user= User()
+    user = User()
     user.email = 'Iam@email.com'
     user.set_password('1111')
     db.session.add(user)
@@ -235,7 +238,7 @@ if __name__ == '__main__':
     backer = Backer()
     backer.owner = user
 
-    db.session.add_all([user,project, payment, image, backer])
+    db.session.add_all([user, project, payment, image, backer])
     db.session.commit()
 
     import ipdb

@@ -1,9 +1,13 @@
 from __future__ import with_statement
+
+from logging.config import fileConfig
+
 from alembic import context
 from sqlalchemy import engine_from_config, pool
-from logging.config import fileConfig
+
 try:
-    import sys,os
+    import sys
+    import os
     sys.path.append(os.path.realpath('.'))
     from app import app, db
 except:

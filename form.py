@@ -1,5 +1,5 @@
+from flask.ext.babelex import gettext, lazy_gettext
 from flask.ext.wtf import Form
-from flask.ext.babelex import lazy_gettext,gettext
 
 from app import app
 from models import User
@@ -35,7 +35,8 @@ class LoginForm(Form):
 class RegisterForm(Form):
     login = StringField(lazy_gettext('Login'), validators=[DataRequired()])
     email = EmailField(lazy_gettext('Email'), validators=[DataRequired()])
-    password = PasswordField(lazy_gettext('Password'), validators=[DataRequired()])
+    password = PasswordField(
+        lazy_gettext('Password'), validators=[DataRequired()])
     password_again = PasswordField(
         lazy_gettext('Password again'), validators=[DataRequired()])
     submit = SubmitField(lazy_gettext('Register'))
@@ -43,7 +44,8 @@ class RegisterForm(Form):
     def validate_email(form, field):
         user = User.query.filter(User.email == field.data).first()
         if user is not None:
-            raise ValidationError(lazy_gettext("A user with that email already exists"))
+            raise ValidationError(
+                lazy_gettext("A user with that email already exists"))
 
 
 class ForgetForm(Form):

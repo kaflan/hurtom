@@ -1,8 +1,9 @@
 # coding: utf-8
 from datetime import date, datetime
-from flask.ext.babelex import lazy_gettext
+
 from flask import (flash, Flask, g, make_response, redirect, render_template,
                    request, url_for)
+from flask.ext.babelex import lazy_gettext
 from flask.ext.classy import FlaskView, route
 from flask.ext.login import (current_user, login_required, login_user,
                              LoginManager, logout_user, UserMixin)
@@ -85,7 +86,9 @@ class Github(Base):
     def callback(self):
         return 'github'
 
+
 class Register(Base):
+
     def index(self):
         return render_template('form.html', form=RegisterForm())
 
@@ -93,8 +96,8 @@ class Register(Base):
         form = RegisterForm()
         if form.validate_on_submit():
             user = User()
-            user.email =  form.email.data
-            user.login =  form.login.data
+            user.email = form.email.data
+            user.login = form.login.data
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()
@@ -118,7 +121,8 @@ class Login(Base):
             print(User.query.all())
             user = db.session.query(User).first(form.email)
             print(user)
-            import ipdb; ipdb.set_trace()
+            import ipdb
+            ipdb.set_trace()
             flash(lazy_gettext("Logged in successfully."))
 
             # login_user(user=user)

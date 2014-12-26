@@ -4,13 +4,11 @@ from logging.handlers import RotatingFileHandler
 
 from flask import Flask, request
 from flask.ext.babelex import Babel
-
 from flask.ext.gravatar import Gravatar
 
 from config import LANGUAGES
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CsrfProtect
-
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -19,6 +17,7 @@ db = SQLAlchemy(app)
 CsrfProtect(app)
 
 babel = Babel(app)
+
 
 @babel.localeselector
 def get_locale():
@@ -39,7 +38,6 @@ if True:
     from login_views import *
     from views import *
     from models import Base
-
 
 
 if __name__ == '__main__':
