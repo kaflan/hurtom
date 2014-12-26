@@ -209,6 +209,11 @@ class Image(Base):
     project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
 
 
+@app.before_first_request
+def setup():
+    Base.metadata.create_all(bind=db.engine)
+
+
 if __name__ == '__main__':
     # engine, Base, Session = create_base()
     Base.metadata.drop_all(bind=db.engine)

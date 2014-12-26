@@ -1,14 +1,14 @@
-"""Add json field
+"""Init
 
-Revision ID: 6d935a38f3
-Revises: 322a9b48c31
-Create Date: 2014-12-26 06:19:02.991625
+Revision ID: 51b35ea457a
+Revises: 
+Create Date: 2014-12-26 06:34:07.223099
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '6d935a38f3'
-down_revision = '322a9b48c31'
+revision = '51b35ea457a'
+down_revision = None
 branch_labels = None
 depends_on = None
 
