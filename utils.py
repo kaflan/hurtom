@@ -26,3 +26,18 @@ def send_email(to_email,to_name, from_name="Robot",
 #            to_name='lolicon',
 #            subject='sdfsdf',
 #            body='body')
+
+class ObjectDict(dict):
+    def __getattr__(self, name):
+        try:
+            return self[name]
+        except KeyError:
+            raise AttributeError(name)
+
+    def __setattr__(self, name, value):
+        self[name] = value
+    @property
+    def __str__(self):
+        return "ObjectDict"
+    def __repr__(self):
+        return self.__str__
