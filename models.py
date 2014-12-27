@@ -3,7 +3,10 @@
 
 from __future__ import division, print_function, unicode_literals
 
+import os
+
 from flask.ext.login import UserMixin
+from flask.helpers import url_for
 
 import bcrypt
 from app import app, db
@@ -90,6 +93,11 @@ class Base(object):
     @property
     def _sesion(self):
         return object_session(self)
+
+    def __repr__(self):
+        "console"
+        return "repr(" + self.__str__() + ")"
+
     #
     # def save(self):
     #     db.session.add(self)
@@ -116,9 +124,8 @@ gravatar = app.extensions['gravatar']
 
 class User(UserMixin, Base):
 
-    @property
     def get_id(self):
-        return str(self.email)
+        return str(self.pk)
     email = Column(UString, nullable=False, unique=True, index=True)
 
     password = Column(String(60))
@@ -139,6 +146,7 @@ class User(UserMixin, Base):
 
     github = Column(JSON)
     google = Column(JSON)
+    facebook = Column(JSON)
 
     avatar = db.Column(db.String(200))
 
@@ -154,6 +162,11 @@ class User(UserMixin, Base):
     backers = relationship(
         "Backer", backref="owner", cascade="all, delete, delete-orphan")
 
+    @validates('email')
+    def validate_email(self, key, address):
+        assert '@' in address
+        return address.lower()
+
     def get_avatar_url(self):
         return 'media/avatar.jpg'
 
@@ -166,6 +179,9 @@ class User(UserMixin, Base):
 
     def check_password(self, value=u""):
         return self.password == bcrypt.hashpw(value.encode("utf-8"), self.password)
+
+    def __str__(self):
+        return "<Instanse of User: {}>".format(self.login or "No login", self.email)
 
 
 class Backer(Base):
@@ -208,43 +224,53 @@ class Image(Base):
     owner_id = Column(Integer, ForeignKey('user.id'))
     project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
 
+    @property
+    def full_path(self):
+        return os.path.join(app.config['MEDIA'], self.filename)
 
-@app.before_first_request
-def setup():
-    Base.metadata.create_all(bind=db.engine)
+    @property
+    def full_url(self):
+        return url_for('media', filename=self.filename)
 
+#
+# @app.before_first_request
+# def setup():
+#     Base.metadata.create_all(bind=db.engine)
+#
 
 if __name__ == '__main__':
     # engine, Base, Session = create_base()
-    Base.metadata.drop_all(bind=db.engine)
-    Base.metadata.create_all(bind=db.engine)
-
-    user = User()
-    user.email = 'Iam@email.com'
-    user.set_password('1111')
-    db.session.add(user)
-
-    project = Project()
-    project.title = 'Title'
-    project.slug = 'Slug'
-    project.description = 'alal'
-    project.sum = 100
-    project.owner = user
-
-    payment = Payment()
-    payment.owner = user
-    payment.project = project
-
-    image = Image()
-    image.owner = user
-    image.project = project
-    image.filename = 'young_loli_hires.png'
-
-    backer = Backer()
-    backer.owner = user
-
-    db.session.add_all([user, project, payment, image, backer])
-    db.session.commit()
+    # Base.metadata.drop_all(bind=db.engine)
+    # Base.metadata.create_all(bind=db.engine)
+    #
+    # user = User()
+    # user.email = 'Iam@email.com'
+    # user.set_password('1111')
+    # db.session.add(user)
+    #
+    # project = Project()
+    # project.title = 'Title'
+    # project.slug = 'Slug'
+    # project.description = 'alal'
+    # project.sum = 100
+    # project.owner = user
+    #
+    # payment = Payment()
+    # payment.owner = user
+    # payment.project = project
+    #
+    # image = Image()
+    # image.owner = user
+    # image.project = project
+    # image.filename = 'young_loli_hires.png'
+    #
+    # backer = Backer()
+    # backer.owner = user
+    #
+    # db.session.add_all([user, project, payment, image, backer])
+    # db.session.commit()
+    user = User.query.first()
+    users = User.query.all()
 
     import ipdb
     ipdb.set_trace()

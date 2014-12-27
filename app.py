@@ -10,22 +10,20 @@ from config import LANGUAGES
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CsrfProtect
 
+
+def make_app(name=__name__):
+    """
+    create your application in a function and register blueprints on it. That way you can create multiple instances
+    of your application with different configurations attached which makes unittesting a lot easier.
+    You can use this to pass in configuration as needed.
+    """
+    # return app
 app = Flask(__name__)
 app.config.from_object('config')
+app.config.from_object('instance.config')
 db = SQLAlchemy(app)
-
 CsrfProtect(app)
-
 babel = Babel(app)
-
-
-@babel.localeselector
-def get_locale():
-    print(request.accept_languages.best_match(LANGUAGES.keys()))
-    return "uk"
-
-# http://flask.pocoo.org/docs/0.10/errorhandling/
-
 gravatar = Gravatar(app,
                     size=100,
                     rating='g',
@@ -34,6 +32,12 @@ gravatar = Gravatar(app,
                     force_lower=False,
                     use_ssl=False,
                     base_url=None)
+
+
+@babel.localeselector
+def get_locale():
+    return request.accept_languages.best_match(LANGUAGES.keys())
+
 if True:
     from login_views import *
     from views import *
@@ -42,6 +46,8 @@ if True:
 
 if __name__ == '__main__':
     print(app.url_map)
+    print(app.instance_path)
+    print(app.static_folder)
 
     # handler = RotatingFileHandler('logs/app.log', maxBytes=10000, backupCount=1)
     # handler.setLevel(logging.INFO)

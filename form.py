@@ -24,10 +24,12 @@ class LoginForm(Form):
         try:
             user = User.query.filter(User.email == form.email.data).one()
         except (MultipleResultsFound, NoResultFound):
-            raise ValidationError(lazy_gettext("Invalid user"))
+            raise ValidationError(
+                lazy_gettext("User with this email do not exists."))
         if user is None:
-            raise ValidationError(lazy_gettext("Invalid user"))
-        if not user.is_valid_password(form.password.data):
+            raise ValidationError(
+                lazy_gettext("User with this email do not exists."))
+        if not user.check_password(form.password.data):
             raise ValidationError(lazy_gettext("Invalid password"))
         form.user = user
 

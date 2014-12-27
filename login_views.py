@@ -1,9 +1,10 @@
 # coding: utf-8
+import datetime
 from datetime import date, datetime
 
-from flask import (flash, Flask, g, make_response, redirect, render_template,
-                   request, url_for)
-from flask.ext.babelex import lazy_gettext
+from flask import (abort, flash, Flask, g, make_response, redirect,
+                   render_template, request, url_for)
+from flask.ext.babelex import gettext, lazy_gettext
 from flask.ext.classy import FlaskView, route
 from flask.ext.login import (current_user, login_required, login_user,
                              LoginManager, logout_user, UserMixin)
@@ -15,13 +16,12 @@ from rauth import OAuth2Service
 
 __author__ = 'ihor'
 
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'Login:index'
-login_manager.login_message = 'Bonvolu ensaluti por uzi tio paĝo.'
+# login_manager.login_message = lazy_gettext('Bonvolu ensaluti por uzi tio paĝo.')
 login_manager.login_message_category = 'info'
-login_manager.session_protection = "strong"
+login_manager.session_protection = 'strong'
 
 
 # login_user(user, remember=True)
@@ -52,19 +52,20 @@ def load_user(userid):
 #     base_url='https://graph.facebook.com/')
 #
 #
-github = OAuth2Service(
-    client_id='db87c735a6ce6faaa2e1',
-    client_secret='90516141b451cc3e2ad7a8e55f4f9711d86813b2',
-    name='github',
-    authorize_url='https://github.com/login/oauth/authorize',
-    access_token_url='https://github.com/login/oauth/access_token',
-    base_url='https://api.github.com/')
 
-print(github.get_authorize_url())
+
+# print(github.get_authorize_url())
 # import ipdb; ipdb.set_trace()
-#data = dict(code=code_, redirect_uri='http://localhost:8000/login/github')
+# data = dict(code=code_, redirect_uri='http://localhost:8000/login/github')
 # session = github.get_auth_session(data=data)
 # session.get('user').json()
+
+
+@app.context_processor
+def push_current_user():
+    '''adding user object to template context'''
+
+    return {'user': current_user}
 
 
 class Base(FlaskView):
@@ -72,24 +73,59 @@ class Base(FlaskView):
     # def before_request(self, name):
 
     def index(self):
-        return 'Index'
-
-    def callback(self):
-        return 'callback'
+        return 'Index not defined ' + self.__class__.__name__
 
 
-class Github(Base):
+class BaseProvider(Base):
+    oauth2_server = None
 
     def index(self):
-        return 'Index'
+        return redirect(self.oauth2_server.get_authorize_url())
 
     def callback(self):
-        return 'github'
+        return self.__class__.__name__
+
+
+class Github(BaseProvider):
+    oauth2_server = OAuth2Service(
+        client_id=app.config['GITHUB_ID'],
+        client_secret=app.config['GITHUB_SECRET'],
+        name='github',
+        authorize_url='https://github.com/login/oauth/authorize',
+        access_token_url='https://github.com/login/oauth/access_token',
+        base_url='https://api.github.com/')
+
+    def callback(self):
+        code = request.args.get('code')
+
+        if code is None:
+            abort(404)
+
+        data = dict(
+            code=code, redirect_uri='http://localhost:8000/auth/github/callback/')
+        session = self.oauth2_server.get_auth_session(data=data)
+        json = session.get('user').json()
+        user = current_user
+        if not user.is_authenticated():
+            user = db.session.query(User).filter_by(
+                email=json['email']).first() or User()
+            # avatar_url
+            user.name = json['name']
+            user.email = json['email']
+            user.login = json['login']
+        setattr(user, self.__class__.__name__.lower(), json)
+        db.session.add(user)
+        db.session.commit()
+        flash('registered')
+        login_user(user)
+        return redirect('/')
 
 
 class Register(Base):
 
     def index(self):
+        if current_user.is_authenticated():
+            flash('You already register!')
         return render_template('form.html', form=RegisterForm())
 
     def post(self):
@@ -101,49 +137,45 @@ class Register(Base):
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()
-            login_user(user=user)
-            flash(lazy_gettext("You registered"))
-            return redirect(url_for('Login:success'))
+            login_user(user)
+            # flash(lazy_gettext('You registered'))
         return render_template('form.html', form=form)
 
 
 class Login(Base):
-    # route_prefix = '/login/'
+    # route_prefix = '/'
     # route_base = '/'
 
     def index(self):
+        if current_user.is_authenticated():
+            flash('You already loginned!')
         return render_template('form.html', form=LoginForm())
 
     def post(self):
         form = LoginForm()
         if form.validate_on_submit():
-            print(form.data)  # success
-            print(User.query.all())
-            user = db.session.query(User).first(form.email)
-            print(user)
-            import ipdb
-            ipdb.set_trace()
-            flash(lazy_gettext("Logged in successfully."))
+            user = db.session.query(User).filter_by(
+                email=form.email.data).first()
+            # flash(lazy_gettext('Logged in successfully.'))
+            flash('loged')
 
-            # login_user(user=user)
-        else:
-            print(form.errors)
-        # import ipdb; ipdb.set_trace()
-        print(form.email.flags)
+            login_user(user, remember=form.remember_me.data)
+
+            user.last_login = datetime.datetime.now()
+            db.session.add(user)
+            db.session.commit()
         return render_template('form.html', form=form)
 
-    def success(self):
-        return 'success logined'
+    def forget_password(self):
+        return 'forget'
 
     @login_required
     def logout(self):
         logout_user()
-        return redirect(url_for('Login:success_logout'))
+        flash('logouted')
+        return redirect('/')
 
-    def success_logout(self):
-        return "you logout"
 
-# Base.register(app)
 Github.register(app)
 Login.register(app)
 Register.register(app)
