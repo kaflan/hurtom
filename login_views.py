@@ -1,4 +1,4 @@
-# coding: utf-8
+__author__ = 'ihor'
 import datetime
 from datetime import date, datetime
 
@@ -14,21 +14,12 @@ from form import LoginForm, RegisterForm
 from models import User
 from rauth import OAuth2Service
 
-__author__ = 'ihor'
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'Login:index'
-# login_manager.login_message = lazy_gettext('Bonvolu ensaluti por uzi tio paĝo.')
+login_manager.login_message = lazy_gettext('Login message')
 login_manager.login_message_category = 'info'
 login_manager.session_protection = 'strong'
-
-
-# login_user(user, remember=True)
-
-
-#
-#     mongo.db.users.save(example_user)
 
 
 @login_manager.user_loader
@@ -36,35 +27,9 @@ def load_user(userid):
     return db.session.query(User).get(userid)
 
 
-#
-# Client ID
-# 5d6035a213a5c92fe834
-# Client Secret
-# ed21f9eea8b9decab6bd834f6ae1a027b1b7b602
-
-#
-# facebook = OAuth2Service(
-#     client_id='440483442642551',
-#     client_secret='cd54f1ace848fa2a7ac89a31ed9c1b61',
-#     name='facebook',
-#     authorize_url='https://graph.facebook.com/oauth/authorize',
-#     access_token_url='https://graph.facebook.com/oauth/access_token',
-#     base_url='https://graph.facebook.com/')
-#
-#
-
-
-# print(github.get_authorize_url())
-# import ipdb; ipdb.set_trace()
-# data = dict(code=code_, redirect_uri='http://localhost:8000/login/github')
-# session = github.get_auth_session(data=data)
-# session.get('user').json()
-
-
 @app.context_processor
 def push_current_user():
     '''adding user object to template context'''
-
     return {'user': current_user}
 
 
@@ -78,12 +43,45 @@ class Base(FlaskView):
 
 class BaseProvider(Base):
     oauth2_server = None
+    user_name = "me"
+    params = None
+
+    @property
+    def name(self):
+        return self.__class__.__name__
 
     def index(self):
         return redirect(self.oauth2_server.get_authorize_url())
 
     def callback(self):
-        return self.__class__.__name__
+        code = request.args.get('code')
+        print(code)
+
+        if code is None:
+            abort(404)
+
+        data = dict(
+            code=code, redirect_uri=url_for(self.name + ':callback'))
+
+        import ipdb
+        ipdb.set_trace()
+        session = self.oauth2_server.get_auth_session(data=data)
+
+        json = session.get('me').json()
+        user = current_user
+        if not user.is_authenticated():
+            user = db.session.query(User).filter_by(
+                email=json['email']).first() or User()
+            # avatar_url
+            user.name = json['name']
+            user.email = json['email']
+            user.login = json['login']
+        setattr(user, self.name.lower(), json)
+        db.session.add(user)
+        db.session.commit()
+        flash('registered')
+        login_user(user)
+        return redirect('/')
 
 
 class Github(BaseProvider):
@@ -95,30 +93,27 @@ class Github(BaseProvider):
         access_token_url='https://github.com/login/oauth/access_token',
         base_url='https://api.github.com/')
 
-    def callback(self):
-        code = request.args.get('code')
 
-        if code is None:
-            abort(404)
+class Facebook(BaseProvider):
+    base_url = 'https://www.facebook.com/dialog/oauth'
 
-        data = dict(
-            code=code, redirect_uri='http://localhost:8000/auth/github/callback/')
-        session = self.oauth2_server.get_auth_session(data=data)
-        json = session.get('user').json()
-        user = current_user
-        if not user.is_authenticated():
-            user = db.session.query(User).filter_by(
-                email=json['email']).first() or User()
-            # avatar_url
-            user.name = json['name']
-            user.email = json['email']
-            user.login = json['login']
-        setattr(user, self.__class__.__name__.lower(), json)
-        db.session.add(user)
-        db.session.commit()
-        flash('registered')
-        login_user(user)
-        return redirect('/')
+    oauth2_server = OAuth2Service(name='facebook',
+                                  # authorize_url=base_url,
+                                  # access_token_url=base_url +'/access_token',
+                                  client_id=app.config['FACEBOOK_ID'],
+                                  client_secret=app.config['FACEBOOK_SECRET'],
+                                  # base_url=base_url,
+                                  authorize_url='https://graph.facebook.com/oauth/authorize',
+                                  access_token_url='https://graph.facebook.com/oauth/access_token',
+                                  base_url='https://graph.facebook.com/'
+                                  )
+
+    def index(self):
+        params = self.params or {'scope': 'read_stream',
+                                 'response_type': 'code',
+                                 'redirect_uri': url_for("Facebook:callback", _external=True)}
+        print(url_for("Facebook:callback", _external=True))
+        return redirect(self.oauth2_server.get_authorize_url(**params))
 
 
 class Register(Base):
@@ -177,5 +172,6 @@ class Login(Base):
 
 
 Github.register(app)
+# Facebook.register(app)
 Login.register(app)
 Register.register(app)

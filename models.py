@@ -55,7 +55,7 @@ Session = scoped_session(sessionmaker(bind=db.engine))  # autocommit=True,
 
 
 class Base(object):
-    __abstract__ = True
+    # __abstract__ = True
     query = Session.query_property()
 
 #    id = Column('id', Integer, primary_key=True)

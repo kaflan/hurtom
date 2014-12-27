@@ -9,7 +9,7 @@ from wtforms import (BooleanField, FieldList, FormField, HiddenField,
                      SubmitField, TextAreaField)
 from wtforms.ext.sqlalchemy.orm import model_form
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import DataRequired, ValidationError
+from wtforms.validators import DataRequired, EqualTo, ValidationError
 
 
 class LoginForm(Form):
@@ -35,12 +35,16 @@ class LoginForm(Form):
 
 
 class RegisterForm(Form):
-    login = StringField(lazy_gettext('Login'), validators=[DataRequired()])
+    login = StringField(lazy_gettext('Login'))
+    # login = StringField(lazy_gettext('Login'), validators=[DataRequired()])
     email = EmailField(lazy_gettext('Email'), validators=[DataRequired()])
     password = PasswordField(
         lazy_gettext('Password'), validators=[DataRequired()])
     password_again = PasswordField(
-        lazy_gettext('Password again'), validators=[DataRequired()])
+        lazy_gettext('Password again'), validators=[
+            DataRequired(),
+            EqualTo("password", message=lazy_gettext("Passwords do not match"))
+        ])
     submit = SubmitField(lazy_gettext('Register'))
 
     def validate_email(form, field):
@@ -53,3 +57,23 @@ class RegisterForm(Form):
 class ForgetForm(Form):
     email = EmailField(lazy_gettext('Email'))
     login = StringField(lazy_gettext('Login'))
+
+
+class ResetPasswordForm(Form):
+
+    ''
+    # token
+    # email
+    # password
+
+
+class ChangePassword(Form):
+    old_password = PasswordField(lazy_gettext('Password'), validators=[
+        DataRequired()])
+
+    password = PasswordField(lazy_gettext('Password'), validators=[
+        DataRequired()])
+
+    confirm_password = PasswordField(lazy_gettext('Confirm password'), validators=[
+        DataRequired(),
+        EqualTo('password', message=lazy_gettext('Passwords must match'))])

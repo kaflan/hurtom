@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-12-25 16:38+0200\n"
+"POT-Creation-Date: 2014-12-27 23:37+0200\n"
 "PO-Revision-Date: 2014-12-25 16:38+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: uk <LL@li.org>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.0-dev\n"
 
-#: form.py:17 form.py:37 form.py:50
+#: form.py:17 form.py:40 form.py:58
 msgid "Email"
 msgstr "Пошта"
 
@@ -27,7 +27,7 @@ msgstr "Пошта"
 msgid "Email required"
 msgstr "Необхідно вказати пошту"
 
-#: form.py:19 form.py:38
+#: form.py:19 form.py:42 form.py:71 form.py:74
 msgid "Password"
 msgstr "Пароль"
 
@@ -43,31 +43,57 @@ msgstr "Запамятати пароль"
 msgid "Sign in"
 msgstr "Ввійти"
 
-#: form.py:27 form.py:29
-msgid "Invalid user"
-msgstr "Неправильний логін чи пароль"
+#: form.py:28 form.py:31
+#, fuzzy
+msgid "User with this email do not exists."
+msgstr "Користувач з такою поштою вже є"
 
-#: form.py:31
+#: form.py:33
 msgid "Invalid password"
 msgstr "Неправильний пароль"
 
-#: form.py:36 form.py:51
+#: form.py:38 form.py:59
 msgid "Login"
 msgstr "Логін"
 
-#: form.py:40
+#: form.py:44
 msgid "Password again"
 msgstr "Пароль знову"
 
-#: form.py:41
+#: form.py:46
+msgid "Passwords do not match"
+msgstr ""
+
+#: form.py:48
 msgid "Register"
 msgstr "Зареєструватися"
 
-#: form.py:46
+#: form.py:54
 msgid "A user with that email already exists"
 msgstr "Користувач з такою поштою вже є"
+
+#: form.py:77
+#, fuzzy
+msgid "Confirm password"
+msgstr "Неправильний пароль"
+
+#: form.py:79
+msgid "Passwords must match"
+msgstr ""
+
+#: login_views.py:20
+msgid "Login message"
+msgstr ""
 
 #: templates/base.html:5
 msgid "Default title"
 msgstr "Тайтл"
+
+#: templates/form.html:22
+#, fuzzy
+msgid "Sign In"
+msgstr "Ввійти"
+
+#~ msgid "Invalid user"
+#~ msgstr "Неправильний логін чи пароль"
 
